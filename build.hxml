@@ -1,0 +1,10 @@
+--library minecraft-api
+
+--class-path src
+nl.imfi_jz.softhardcore
+
+#-D mc_debug
+#-D log
+
+--cmd del HardcoreLightly.jar
+--cmd rename HxMcPlugin.jar HardcoreLightly.jar
