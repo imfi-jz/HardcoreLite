@@ -3,8 +3,8 @@
 --class-path src
 nl.imfi_jz.softhardcore
 
--D mc_debug
--D log
+#-D mc_debug
+#-D log
 
 --cmd del HardcoreLite.jar
 --cmd rename HxMcPlugin.jar HardcoreLite.jar

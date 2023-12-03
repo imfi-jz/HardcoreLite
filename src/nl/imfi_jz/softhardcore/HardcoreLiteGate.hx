@@ -1,5 +1,7 @@
 package nl.imfi_jz.softhardcore;
 
+import nl.imfi_jz.minecraft_api.implementation.Recipe.ConstructableShapedRecipe;
+import nl.imfi_jz.minecraft_api.implementation.Recipe.ConstructableShapelessRecipe;
 import nl.imfi_jz.softhardcore.event.PlayerInteractEvent;
 import nl.imfi_jz.softhardcore.command.SetHealthReductionCommand;
 import nl.imfi_jz.softhardcore.command.SetMaxHealthCommand;
@@ -21,6 +23,8 @@ class HardcoreLiteGate implements Gate {
             plugin.getName() + ' configuration.'
         ));
 
+        final healthIncraeseItemUtil = new HealthIncreaseItemUtil(plugin.getName(), plugin.getGame().getItemFactory(), config);
+
         plugin.getRegisterer().registerEvent(
             new PlayerDeathEvent(config)
         );
@@ -28,8 +32,23 @@ class HardcoreLiteGate implements Gate {
             new PlayerRespawnEvent(config, plugin.getGame().getDisplayableMessageBuilder(), plugin.getScheduler())
         );
         plugin.getRegisterer().registerEvent(
-            new PlayerInteractEvent(config, plugin.getGame().getDisplayableMessageBuilder())
+            new PlayerInteractEvent(
+                config,
+                plugin.getGame().getDisplayableMessageBuilder(),
+                healthIncraeseItemUtil,
+                plugin.getGame()
+            )
         );
+
+        final healthIncreaseItemRecipe = config.getHealthIncreaseItemCraftingRecipe();
+        plugin.getRegisterer().registerShapedRecipe(new ConstructableShapedRecipe(
+            [
+                [healthIncreaseItemRecipe[0], healthIncreaseItemRecipe[1], healthIncreaseItemRecipe[2]],
+                [healthIncreaseItemRecipe[3], healthIncreaseItemRecipe[4], healthIncreaseItemRecipe[5]],
+                [healthIncreaseItemRecipe[6], healthIncreaseItemRecipe[7], healthIncreaseItemRecipe[8]]
+            ],
+            healthIncraeseItemUtil.createHealthIncreaseItem()
+        ));
 
         plugin.getRegisterer().registerCommand(
             new SetMaxHealthCommand(plugin.getGame().getWorlds())
