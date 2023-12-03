@@ -10,7 +10,7 @@ import nl.imfi_jz.minecraft_api.Gate;
 import nl.imfi_jz.softhardcore.file.Config;
 
 @:keep
-class HardcoreLightlyGate implements Gate {
+class HardcoreLiteGate implements Gate {
 
 	public function enable(plugin:Plugin) {
         Debugger.setLogger(plugin.getLoggerHolder());
