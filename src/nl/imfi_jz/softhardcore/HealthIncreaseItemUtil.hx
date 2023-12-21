@@ -19,10 +19,17 @@ class HealthIncreaseItemUtil {
         return item?.getCaption().contains(identifyingLore);
     }
 
-    public function createHealthIncreaseItem():Item {
-        final item = itemFactory.createGameObject(config.getHealthIncreaseItemName());
-        item.setCaption([identifyingLore]);
+    public function createHealthIncreaseItem():Null<Item> {
+        final itemName = config.getHealthIncreaseItemName();
+        
+        if(itemName == null){
+            return null;
+        }
+        else {
+            final item = itemFactory.createGameObject(itemName);
+            item.setCaption([identifyingLore]);
 
-        return item;
+            return item;
+        }
     }
 }

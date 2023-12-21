@@ -1,7 +1,6 @@
 package nl.imfi_jz.softhardcore;
 
 import nl.imfi_jz.minecraft_api.implementation.Recipe.ConstructableShapedRecipe;
-import nl.imfi_jz.minecraft_api.implementation.Recipe.ConstructableShapelessRecipe;
 import nl.imfi_jz.softhardcore.event.PlayerInteractEvent;
 import nl.imfi_jz.softhardcore.command.SetHealthReductionCommand;
 import nl.imfi_jz.softhardcore.command.SetMaxHealthCommand;
@@ -16,8 +15,11 @@ class HardcoreLiteGate implements Gate {
 
 	public function enable(plugin:Plugin) {
         Debugger.setLogger(plugin.getLoggerHolder());
+        #if !mc_debug
+            plugin.getConsoleLogger().setSeverityLevelMute(nl.imfi_jz.minecraft_api.MessageReceiver.SeverityGuideline.Log, true);
+        #end
 
-        final config = new Config(plugin.getFileSystemManager().getIniFile(
+        final config = new Config(plugin.getFileSystemManager().getYmlFile(
             "config",
             null,
             plugin.getName() + ' configuration.'
@@ -41,14 +43,17 @@ class HardcoreLiteGate implements Gate {
         );
 
         final healthIncreaseItemRecipe = config.getHealthIncreaseItemCraftingRecipe();
-        plugin.getRegisterer().registerShapedRecipe(new ConstructableShapedRecipe(
-            [
-                [healthIncreaseItemRecipe[0], healthIncreaseItemRecipe[1], healthIncreaseItemRecipe[2]],
-                [healthIncreaseItemRecipe[3], healthIncreaseItemRecipe[4], healthIncreaseItemRecipe[5]],
-                [healthIncreaseItemRecipe[6], healthIncreaseItemRecipe[7], healthIncreaseItemRecipe[8]]
-            ],
-            healthIncraeseItemUtil.createHealthIncreaseItem()
-        ));
+        final healthIncreaseItem = healthIncraeseItemUtil.createHealthIncreaseItem();
+        if(healthIncreaseItem != null){
+            plugin.getRegisterer().registerShapedRecipe(new ConstructableShapedRecipe(
+                [
+                    [healthIncreaseItemRecipe[0], healthIncreaseItemRecipe[1], healthIncreaseItemRecipe[2]],
+                    [healthIncreaseItemRecipe[3], healthIncreaseItemRecipe[4], healthIncreaseItemRecipe[5]],
+                    [healthIncreaseItemRecipe[6], healthIncreaseItemRecipe[7], healthIncreaseItemRecipe[8]]
+                ],
+                healthIncreaseItem
+            ));
+        }
 
         plugin.getRegisterer().registerCommand(
             new SetMaxHealthCommand(plugin.getGame().getWorlds())

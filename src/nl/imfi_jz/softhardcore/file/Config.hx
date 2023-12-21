@@ -9,35 +9,36 @@ class Config {
     private static inline final HEALTH_INCREASE_AMOUNT_KEY = "Hearts restored upon using item";
     private static inline final HEALTH_INCREASE_MAX_KEY = "Maximum hearts that can be restored";
 
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_LEFT_KEY = "Health increase item recipe item top left";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_MID_KEY = "Health increase item recipe item top middle";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_RIGHT_KEY = "Health increase item recipe item top right";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_LEFT_KEY = "Health increase item recipe item middle left";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_MID_KEY = "Health increase item recipe item middle middle";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_RIGHT_KEY = "Health increase item recipe item middle right";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_LEFT_KEY = "Health increase item recipe item bottom left";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_MID_KEY = "Health increase item recipe item bottom middle";
-    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_RIGHT_KEY = "Health increase item recipe item bottom right";
+    private static inline final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY = "Health increase item recipe items";
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_LEFT_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Top left"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_MID_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Top middle"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_RIGHT_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Top right"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_LEFT_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Middle left"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_MID_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Middle middle"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_RIGHT_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Middle right"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_LEFT_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Bottom left"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_MID_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Bottom middle"];
+    private static final HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_RIGHT_KEY = [HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_SECTION_KEY, "Bottom right"];
 
-    private final iniFile:KeyValueFile<String>;
+    private final file:NestableKeyValueFile<Any>;
 
-    public function new(iniFile) {
-        this.iniFile = iniFile;
+    public function new(file) {
+        this.file = file;
         final healthIncreaseItemName = 'Totem of Undying';
 
-        if(iniFile.getValue(HEALTH_REDUCTION_ON_DEATH_KEY) == null){
+        if(file.getValue(HEALTH_REDUCTION_ON_DEATH_KEY) == null){
             setHealthReductionOnDeath(1);
         }
 
-        if(iniFile.getValue(HEALTH_INCREASE_ITEM_NAME_KEY) == null){
+        if(file.getValue(HEALTH_INCREASE_ITEM_NAME_KEY) == null){
             setHealthIncreaseItemName(healthIncreaseItemName);
         }
 
-        if(iniFile.getValue(HEALTH_INCREASE_AMOUNT_KEY) == null){
+        if(file.getValue(HEALTH_INCREASE_AMOUNT_KEY) == null){
             setHealthIncreaseAmount(5);
         }
 
-        if(iniFile.getValue(HEALTH_INCREASE_MAX_KEY) == null){
+        if(file.getValue(HEALTH_INCREASE_MAX_KEY) == null){
             setHealthIncreaseMax(10);
         }
 
@@ -65,14 +66,17 @@ class Config {
     }
 
     public function getHealthReductionOnDeath():Float {
-        return Std.parseFloat(iniFile.getValue(HEALTH_REDUCTION_ON_DEATH_KEY));
+        return Std.parseFloat(file.getValue(HEALTH_REDUCTION_ON_DEATH_KEY));
     }
     public function setHealthReductionOnDeath(value:Float) {
-        iniFile.setValue(HEALTH_REDUCTION_ON_DEATH_KEY, Std.string(value));
+        file.setValue(HEALTH_REDUCTION_ON_DEATH_KEY, value);
     }
 
     public function getHealthIncreaseItemName():Null<String> {
-        final itemName = iniFile.getValue(HEALTH_INCREASE_ITEM_NAME_KEY)?.toUpperCase();
+        final val = file.getValue(HEALTH_INCREASE_ITEM_NAME_KEY);
+        final itemName = val is String
+            ? cast(val, String).toUpperCase()
+            : null;
 
         if(itemName == null
             || itemName == ''
@@ -85,47 +89,47 @@ class Config {
         return itemName;
     }
     private function setHealthIncreaseItemName(value:String) {
-        iniFile.setValue(HEALTH_INCREASE_ITEM_NAME_KEY, value);
+        file.setValue(HEALTH_INCREASE_ITEM_NAME_KEY, value);
     }
 
     public function getHealthIncreaseAmount():Float {
-        return Std.parseFloat(iniFile.getValue(HEALTH_INCREASE_AMOUNT_KEY));
+        return Std.parseFloat(file.getValue(HEALTH_INCREASE_AMOUNT_KEY));
     }
     private function setHealthIncreaseAmount(value:Float) {
-        iniFile.setValue(HEALTH_INCREASE_AMOUNT_KEY, Std.string(value));
+        file.setValue(HEALTH_INCREASE_AMOUNT_KEY, value);
     }
 
     public function getHealthIncreaseMax():Float {
-        return Std.parseFloat(iniFile.getValue(HEALTH_INCREASE_MAX_KEY));
+        return Std.parseFloat(file.getValue(HEALTH_INCREASE_MAX_KEY));
     }
     private function setHealthIncreaseMax(value:Float) {
-        iniFile.setValue(HEALTH_INCREASE_MAX_KEY, Std.string(value));
+        file.setValue(HEALTH_INCREASE_MAX_KEY, value);
     }
 
     public function getHealthIncreaseItemCraftingRecipe():Vector<String> {
         final recipe = new Vector<String>(9);
 
-        recipe[0] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_LEFT_KEY);
-        recipe[1] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_MID_KEY);
-        recipe[2] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_RIGHT_KEY);
-        recipe[3] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_LEFT_KEY);
-        recipe[4] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_MID_KEY);
-        recipe[5] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_RIGHT_KEY);
-        recipe[6] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_LEFT_KEY);
-        recipe[7] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_MID_KEY);
-        recipe[8] = iniFile.getValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_RIGHT_KEY);
+        recipe[0] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_LEFT_KEY);
+        recipe[1] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_MID_KEY);
+        recipe[2] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_RIGHT_KEY);
+        recipe[3] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_LEFT_KEY);
+        recipe[4] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_MID_KEY);
+        recipe[5] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_RIGHT_KEY);
+        recipe[6] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_LEFT_KEY);
+        recipe[7] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_MID_KEY);
+        recipe[8] = file.getValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_RIGHT_KEY);
 
         return recipe;
     }
     private function setHealthIncreaseItemCraftingRecipe(recipe:Vector<String>) {
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_LEFT_KEY, recipe[0]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_MID_KEY, recipe[1]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_RIGHT_KEY, recipe[2]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_LEFT_KEY, recipe[3]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_MID_KEY, recipe[4]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_RIGHT_KEY, recipe[5]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_LEFT_KEY, recipe[6]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_MID_KEY, recipe[7]);
-        iniFile.setValue(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_RIGHT_KEY, recipe[8]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_LEFT_KEY, recipe[0]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_MID_KEY, recipe[1]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_TOP_RIGHT_KEY, recipe[2]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_LEFT_KEY, recipe[3]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_MID_KEY, recipe[4]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_MID_RIGHT_KEY, recipe[5]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_LEFT_KEY, recipe[6]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_MID_KEY, recipe[7]);
+        file.setValueByNestedKey(HEALTH_INCREASE_ITEM_CRAFTING_RECIPE_BOT_RIGHT_KEY, recipe[8]);
     }
 }
